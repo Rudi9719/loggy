@@ -51,14 +51,15 @@ type LogOpts struct {
 	UseStdout bool
 }
 
-// A basic Logger with options for logging to file, keybase or stdout
+// A basic Logger with options for logging to file, keybase or stdout.
+// More functionality could be added within the internal handleLog() func.
 type Logger struct {
 	opts LogOpts
 	k    *keybase.Keybase
 	team keybase.Channel
 }
 
-// Generate string from Log
+// Generate string from type Log with severity prepended
 func (msg Log) String() string {
 	levels := [...]string{
 		"StdoutOnly",
@@ -70,13 +71,13 @@ func (msg Log) String() string {
 	return fmt.Sprintf("%s: %s", levels[msg.Level], msg.Msg)
 }
 
-// Generate a timestamp
+// Generate a timestamp for non-Keybase logs
 func timeStamp() string {
 	now := time.Now()
 	return now.Format("02Jan06 15:04:05.9999")
 }
 
-// Write log to file
+// Write log to file from LogOpts
 func (l Logger) toFile(msg Log) {
 	output := fmt.Sprintf("[%s] %s",
 		timeStamp(), msg.String())
@@ -143,18 +144,20 @@ func (l Logger) LogError(msg string) {
 }
 
 // Log Critical shortcut from string
+// !!! This will terminate the program !!!
 func (l Logger) LogCritical(msg string) {
 	var logMsg Log
 	logMsg.Level = Critical
 	logMsg.Msg = msg
-
+	// Handles log, then terminates program
 	handleLog(l, logMsg)
-	os.Exit(3)
+	os.Exit(-1)
 }
 
 // Log error type for compatibility
 func (l Logger) LogErrorType(e error) {
 	var logMsg Log
+	// Will set Level to Critical without terminating program
 	logMsg.Level = Critical
 	logMsg.Msg = e.Error()
 	handleLog(l, logMsg)
