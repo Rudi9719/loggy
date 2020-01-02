@@ -31,19 +31,28 @@ type Log struct {
 
 // Logging options to be passed to NewLogger()
 type LogOpts struct {
-	toFile    bool
+	// Will set to true if OutFile is set
+	toFile bool
+	// Will set to true if KBTeam is set
 	toKeybase bool
-	toStdout  bool
-	OutFile   string
-	KBTeam    string
-	KBChann   string
-	Level     LogLevel
-	ProgName  string
+	// Will set to true if UseStdout is true
+	toStdout bool
+	// Output file for logging
+	OutFile string
+	// Keybase Team for logging
+	KBTeam string
+	// Keybase Channel for logging
+	KBChann string
+	// Log level / verbosity (see LogLevel)
+	Level LogLevel
+	// Program name for Keybase logging
+	ProgName string
+	// Use stdout
 	UseStdout bool
 }
 
 // A basic Logger with options for logging to file, keybase or stdout
-type logger struct {
+type Logger struct {
 	opts LogOpts
 	k    *keybase.Keybase
 	team keybase.Channel
@@ -68,7 +77,7 @@ func timeStamp() string {
 }
 
 // Write log to file
-func (l logger) toFile(msg Log) {
+func (l Logger) toFile(msg Log) {
 	output := fmt.Sprintf("[%s] %s",
 		timeStamp(), msg.String())
 
@@ -85,7 +94,7 @@ func (l logger) toFile(msg Log) {
 }
 
 // Send log to Keybase
-func (l logger) toKeybase(msg Log) {
+func (l Logger) toKeybase(msg Log) {
 	output := fmt.Sprintf("[%s] %s",
 		l.opts.ProgName, msg.String())
 	chat := l.k.NewChat(l.team)
@@ -94,22 +103,22 @@ func (l logger) toKeybase(msg Log) {
 }
 
 // Write log to Stdout
-func (l logger) toStdout(msg Log) {
+func (l Logger) toStdout(msg Log) {
 	output := fmt.Sprintf("[%s] %s",
 		timeStamp(), msg.String())
 	fmt.Println(output)
 }
 
-// Log Info
-func (l logger) LogInfo(msg string) {
+// Log Info shortcut from string
+func (l Logger) LogInfo(msg string) {
 	var logMsg Log
 	logMsg.Level = Info
 	logMsg.Msg = msg
 	handleLog(l, logMsg)
 }
 
-// Log Debug
-func (l logger) LogDebug(msg string) {
+// Log Debug shortcut from string
+func (l Logger) LogDebug(msg string) {
 	var logMsg Log
 	logMsg.Level = Debug
 	logMsg.Msg = msg
@@ -117,24 +126,24 @@ func (l logger) LogDebug(msg string) {
 	handleLog(l, logMsg)
 }
 
-// Log Warning
-func (l logger) LogWarn(msg string) {
+// Log Warning shortcut from string
+func (l Logger) LogWarn(msg string) {
 	var logMsg Log
 	logMsg.Level = Warnings
 	logMsg.Msg = msg
 	handleLog(l, logMsg)
 }
 
-// Log Error
-func (l logger) LogError(msg string) {
+// Log Error shortcut from string
+func (l Logger) LogError(msg string) {
 	var logMsg Log
 	logMsg.Level = Errors
 	logMsg.Msg = msg
 	handleLog(l, logMsg)
 }
 
-// Log Critical
-func (l logger) LogCritical(msg string) {
+// Log Critical shortcut from string
+func (l Logger) LogCritical(msg string) {
 	var logMsg Log
 	logMsg.Level = Critical
 	logMsg.Msg = msg
@@ -143,15 +152,15 @@ func (l logger) LogCritical(msg string) {
 	os.Exit(3)
 }
 
-// Log error type
-func (l logger) LogErrorType(e error) {
+// Log error type for compatibility
+func (l Logger) LogErrorType(e error) {
 	var logMsg Log
 	logMsg.Level = Critical
 	logMsg.Msg = e.Error()
 	handleLog(l, logMsg)
 }
 
-func handleLog(l logger, logMsg Log) {
+func handleLog(l Logger, logMsg Log) {
 
 	if logMsg.Level > l.opts.Level && logMsg.Level != 0 {
 		return
@@ -172,23 +181,25 @@ func handleLog(l logger, logMsg Log) {
 
 }
 
-func (l logger) Log(level LogLevel, msg string) {
+// Log func, takes LogLevel and string and passes to internal handler.
+func (l Logger) Log(level LogLevel, msg string) {
 	var logMsg Log
 	logMsg.Level = level
 	logMsg.Msg = msg
 	handleLog(l, logMsg)
 }
 
-func (l logger) LogMsg(msg Log) {
+// LogMsg takes a type Log and passes it to internal handler.
+func (l Logger) LogMsg(msg Log) {
 	handleLog(l, msg)
 }
 
 // Create a new logger instance and pass it
-func NewLogger(opts LogOpts) logger {
+func NewLogger(opts LogOpts) Logger {
 	if opts.Level == 0 {
 		opts.Level = 2
 	}
-	var l logger
+	var l Logger
 	if opts.KBTeam != "" {
 		l.k = keybase.NewKeybase()
 		var chann keybase.Channel
