@@ -96,8 +96,13 @@ func (l Logger) toFile(msg Log) {
 
 // Send log to Keybase
 func (l Logger) toKeybase(msg Log) {
-	output := fmt.Sprintf("[%s] %s",
-		l.opts.ProgName, msg.String())
+	tag := ""
+	if msg.Level <= 2 {
+		tag = "@everyone "
+	}
+	output := fmt.Sprintf("[%s] %s%s",
+		l.opts.ProgName, tag, msg.String())
+
 	chat := l.k.NewChat(l.team)
 	chat.Send(output)
 
@@ -144,12 +149,18 @@ func (l Logger) LogError(msg string) {
 }
 
 // Log Critical shortcut from string
-// !!! This will terminate the program !!!
 func (l Logger) LogCritical(msg string) {
 	var logMsg Log
 	logMsg.Level = Critical
 	logMsg.Msg = msg
-	// Handles log, then terminates program
+	handleLog(l, logMsg)
+}
+
+// Log Critical shortcut that terminates progra
+func (l Logger) LogPanic(msg string) {
+	var logMsg Log
+	logMsg.Level = Critical
+	logMsg.Msg = msg
 	handleLog(l, logMsg)
 	os.Exit(-1)
 }
