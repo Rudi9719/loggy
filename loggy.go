@@ -140,7 +140,7 @@ func (l Logger) LogWarn(msg string) {
 	handleLog(l, logMsg)
 }
 
-// Log Error shortcut from string
+// Log Error shortcut from string - Will notify Keybase users
 func (l Logger) LogError(msg string) {
 	var logMsg Log
 	logMsg.Level = Errors
@@ -148,7 +148,7 @@ func (l Logger) LogError(msg string) {
 	handleLog(l, logMsg)
 }
 
-// Log Critical shortcut from string
+// Log Critical shortcut from string - Will notifiy Keybase users
 func (l Logger) LogCritical(msg string) {
 	var logMsg Log
 	logMsg.Level = Critical
@@ -156,7 +156,7 @@ func (l Logger) LogCritical(msg string) {
 	handleLog(l, logMsg)
 }
 
-// Log Critical shortcut that terminates progra
+// Log Critical shortcut that terminates program
 func (l Logger) LogPanic(msg string) {
 	var logMsg Log
 	logMsg.Level = Critical
@@ -165,7 +165,7 @@ func (l Logger) LogPanic(msg string) {
 	os.Exit(-1)
 }
 
-// Log error type for compatibility
+// Log error type for compatibility - Will notify keybase users
 func (l Logger) LogErrorType(e error) {
 	var logMsg Log
 	// Will set Level to Critical without terminating program
@@ -174,6 +174,7 @@ func (l Logger) LogErrorType(e error) {
 	handleLog(l, logMsg)
 }
 
+// Func to hack to add other logging functionality
 func handleLog(l Logger, logMsg Log) {
 
 	if logMsg.Level > l.opts.Level && logMsg.Level != 0 {
