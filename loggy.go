@@ -120,7 +120,7 @@ func (l Logger) LogInfo(msg string) {
 	var logMsg Log
 	logMsg.Level = Info
 	logMsg.Msg = msg
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // Log Debug shortcut from string
@@ -129,7 +129,7 @@ func (l Logger) LogDebug(msg string) {
 	logMsg.Level = Debug
 	logMsg.Msg = msg
 
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // Log Warning shortcut from string
@@ -137,7 +137,7 @@ func (l Logger) LogWarn(msg string) {
 	var logMsg Log
 	logMsg.Level = Warnings
 	logMsg.Msg = msg
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // Log Error shortcut from string - Will notify Keybase users
@@ -145,7 +145,7 @@ func (l Logger) LogError(msg string) {
 	var logMsg Log
 	logMsg.Level = Errors
 	logMsg.Msg = msg
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // Log Critical shortcut from string - Will notifiy Keybase users
@@ -153,7 +153,7 @@ func (l Logger) LogCritical(msg string) {
 	var logMsg Log
 	logMsg.Level = Critical
 	logMsg.Msg = msg
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // Log Critical shortcut that terminates program
@@ -171,7 +171,7 @@ func (l Logger) LogErrorType(e error) {
 	// Will set Level to Critical without terminating program
 	logMsg.Level = Critical
 	logMsg.Msg = e.Error()
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // Func to hack to add other logging functionality
@@ -181,17 +181,17 @@ func handleLog(l Logger, logMsg Log) {
 		return
 	}
 	if logMsg.Level == 0 {
-		l.toStdout(logMsg)
+		go l.toStdout(logMsg)
 		return
 	}
 	if l.opts.toKeybase {
-		l.toKeybase(logMsg)
+		go l.toKeybase(logMsg)
 	}
 	if l.opts.toFile {
-		l.toFile(logMsg)
+		go l.toFile(logMsg)
 	}
 	if l.opts.toStdout {
-		l.toStdout(logMsg)
+		go l.toStdout(logMsg)
 	}
 
 }
@@ -201,12 +201,12 @@ func (l Logger) Log(level LogLevel, msg string) {
 	var logMsg Log
 	logMsg.Level = level
 	logMsg.Msg = msg
-	handleLog(l, logMsg)
+	go handleLog(l, logMsg)
 }
 
 // LogMsg takes a type Log and passes it to internal handler.
 func (l Logger) LogMsg(msg Log) {
-	handleLog(l, msg)
+	go handleLog(l, msg)
 }
 
 // Create a new logger instance and pass it
