@@ -37,17 +37,17 @@ type LogOpts struct {
 	toKeybase bool
 	// Will set to true if UseStdout is true
 	toStdout bool
-	// Output file for logging
+	// Output file for logging - Required for file output
 	OutFile string
-	// Keybase Team for logging
+	// Keybase Team for logging - Required for Keybase output
 	KBTeam string
-	// Keybase Channel for logging
+	// Keybase Channel for logging - Optional for Keybase output
 	KBChann string
 	// Log level / verbosity (see LogLevel)
 	Level LogLevel
-	// Program name for Keybase logging
+	// Program name for Keybase logging - Required for Keybase output
 	ProgName string
-	// Use stdout
+	// Use stdout  - Required to print to stdout
 	UseStdout bool
 }
 
