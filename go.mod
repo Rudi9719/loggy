@@ -1,4 +1,4 @@
-module GO/loggy
+module github.com/rudi9719/loggy
 
 go 1.13
 
