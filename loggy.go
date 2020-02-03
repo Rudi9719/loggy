@@ -10,9 +10,9 @@ type LogLevel int
 
 const (
 	// Info level logging
-	Info LogLevel = 5
+	Info LogLevel = 4
 	// Debugging output
-	Debug LogLevel = 4
+	Debug LogLevel = 5
 	// Will show if logger is set to warning
 	Warnings LogLevel = 3
 	// Errors will show by default
