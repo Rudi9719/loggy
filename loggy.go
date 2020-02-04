@@ -66,8 +66,8 @@ func (msg Log) String() string {
 		"Critical",
 		"Error",
 		"Warning",
-		"Debug",
-		"Info"}
+		"Info",
+		"Debug"}
 	return fmt.Sprintf("%s: %s", levels[msg.Level], msg.Msg)
 }
 
