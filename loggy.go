@@ -1,35 +1,38 @@
 package loggy
 
-import "samhofi.us/x/keybase"
-import "time"
-import "fmt"
-import "os"
+import (
+	"fmt"
+	"os"
+	"time"
 
-// Level of importance for a log message
+	"samhofi.us/x/keybase"
+)
+
+// LogLevel of importance for a log message
 type LogLevel int
 
 const (
-	// Info level logging
-	Info LogLevel = 4
-	// Debugging output
+	// Debug output and below
 	Debug LogLevel = 5
-	// Will show if logger is set to warning
+	// Info ouput and below
+	Info LogLevel = 4
+	// Warnings and below
 	Warnings LogLevel = 3
 	// Errors will show by default
 	Errors LogLevel = 2
 	// Critical will show but can be silenced
 	Critical LogLevel = 1
-	// Special level for only showing via stdout
+	// StdoutOnly for only showing via stdout
 	StdoutOnly LogLevel = 0
 )
 
-// A basic Log struct with type and message
+// Log struct with type and message
 type Log struct {
 	Level LogLevel
 	Msg   string
 }
 
-// Logging options to be passed to NewLogger()
+// LogOpts to be passed to NewLogger()
 type LogOpts struct {
 	// Will set to true if OutFile is set
 	toFile bool
@@ -51,7 +54,7 @@ type LogOpts struct {
 	UseStdout bool
 }
 
-// A basic Logger with options for logging to file, keybase or stdout.
+// Logger with options for logging to file, keybase or stdout.
 // More functionality could be added within the internal handleLog() func.
 type Logger struct {
 	opts LogOpts
@@ -115,57 +118,57 @@ func (l Logger) toStdout(msg Log) {
 	fmt.Println(output)
 }
 
-// Log Info shortcut from string
-func (l Logger) LogInfo(msg string) {
+// LogInfo shortcut from string
+func (l Logger) LogInfo(msg string, a ...interface{}) {
 	var logMsg Log
 	logMsg.Level = Info
-	logMsg.Msg = msg
+	logMsg.Msg = fmt.Sprintf(msg, a...)
 	go handleLog(l, logMsg)
 }
 
-// Log Debug shortcut from string
-func (l Logger) LogDebug(msg string) {
+// LogDebug shortcut from string
+func (l Logger) LogDebug(msg string, a ...interface{}) {
 	var logMsg Log
 	logMsg.Level = Debug
-	logMsg.Msg = msg
+	logMsg.Msg = fmt.Sprintf(msg, a...)
 
 	go handleLog(l, logMsg)
 }
 
-// Log Warning shortcut from string
-func (l Logger) LogWarn(msg string) {
+// LogWarn shortcut from string
+func (l Logger) LogWarn(msg string, a ...interface{}) {
 	var logMsg Log
 	logMsg.Level = Warnings
-	logMsg.Msg = msg
+	logMsg.Msg = fmt.Sprintf(msg, a...)
 	go handleLog(l, logMsg)
 }
 
-// Log Error shortcut from string - Will notify Keybase users
-func (l Logger) LogError(msg string) {
+// LogError shortcut from string - Will notify Keybase users
+func (l Logger) LogError(msg string, a ...interface{}) {
 	var logMsg Log
 	logMsg.Level = Errors
-	logMsg.Msg = msg
+	logMsg.Msg = fmt.Sprintf(msg, a...)
 	go handleLog(l, logMsg)
 }
 
-// Log Critical shortcut from string - Will notifiy Keybase users
-func (l Logger) LogCritical(msg string) {
+// LogCritical shortcut from string - Will notifiy Keybase users
+func (l Logger) LogCritical(msg string, a ...interface{}) {
 	var logMsg Log
 	logMsg.Level = Critical
-	logMsg.Msg = msg
+	logMsg.Msg = fmt.Sprintf(msg, a...)
 	go handleLog(l, logMsg)
 }
 
-// Log Critical shortcut that terminates program
-func (l Logger) LogPanic(msg string) {
+// LogPanic is a LogCritical shortcut that terminates program
+func (l Logger) LogPanic(msg string, a ...interface{}) {
 	var logMsg Log
 	logMsg.Level = Critical
-	logMsg.Msg = msg
+	logMsg.Msg = fmt.Sprintf(msg, a...)
 	handleLog(l, logMsg)
 	os.Exit(-1)
 }
 
-// Log error type for compatibility - Will notify keybase users
+// LogErrorType for compatibility - Will notify keybase users
 func (l Logger) LogErrorType(e error) {
 	var logMsg Log
 	// Will set Level to Critical without terminating program
@@ -209,14 +212,14 @@ func (l Logger) LogMsg(msg Log) {
 	go handleLog(l, msg)
 }
 
-// PanicSafe() is a deferrable function to recover from a panic operation.
+// PanicSafe is a deferrable function to recover from a panic operation.
 func (l Logger) PanicSafe() {
 	if r := recover(); r != nil {
 		l.LogCritical(fmt.Sprintf("Panic detected: %+v", r))
 	}
 }
 
-// Create a new logger instance and pass it
+// NewLogger creates a new logger instance using LogOpts
 func NewLogger(opts LogOpts) Logger {
 	if opts.Level == 0 {
 		opts.Level = 2
