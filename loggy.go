@@ -14,7 +14,7 @@ type LogLevel int
 const (
 	// Debug output and below
 	Debug LogLevel = 5
-	// Info ouput and below
+	// Info output and below
 	Info LogLevel = 4
 	// Warnings and below
 	Warnings LogLevel = 3
