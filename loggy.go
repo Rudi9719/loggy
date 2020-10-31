@@ -213,9 +213,10 @@ func (l Logger) LogMsg(msg Log) {
 }
 
 // PanicSafe is a deferrable function to recover from a panic operation.
-func (l Logger) PanicSafe() {
+func (l Logger) PanicSafe(a ...interface{}) {
 	if r := recover(); r != nil {
-		l.LogCritical(fmt.Sprintf("Panic detected: %+v", r))
+		l.LogCritical("Panic detected: %+v", r)
+		l.LogCritical("Optional panic data: %+v", a...)
 	}
 }
 
